@@ -1,17 +1,17 @@
 # The Docker-Compose File Explained
 
-A short overview over the docker compose file.
+A short overview of the docker compose file.
 
 ## The Services
 
 The file 7 services, 6 are required while 1 is optional.
-The `ui` and `backend` service are the QHAna UI and the QHAna backend respectively.
+The `ui` and `backend` services are the QHAna UI and the QHAna backend respectively.
 The UI is a web frontend written in Angular.
 The backend stores all experiment data and is written in ballerina.
 The plugins use 4 services in total in the default configuration.
-The `qhana-plugin-runner` service serves the REST APIs of the plugins, while the worker perferms the background computation tasks.
+The `qhana-plugin-runner` service serves the REST APIs of the plugins, while the worker performs the background computation tasks.
 `Redis` is used as the task queue service and data is stored in the `postgres` database.
-The `muse-db` service is optional and provides the muse data in a live mysql database.
+The `muse-db` service is optional and provides the muse data in a live MySQL database.
 
 ```{warning}
 The services `qhana-plugin-runner` and `worker` must have the exact same configuration apart from the concurrency settings.
@@ -75,7 +75,7 @@ This port can be changed to any other open port.
 The QHAna UI expects the backend to answer at port 9090.
 If the backend port is changed in the docker-compose file, then the port must be changed in the settings page of the QHAna UI for each client using the UI.
 The plugin runner api service is exposed under port `5005` by default.
-The addresses of all known plugin runners can be edited in the settings page of the QHAna UI.
+The addresses of all known plugin runners can be edited from the settings page of the QHAna UI.
 This has to be done only once as the list is stored in the QHAna backend.
 The exposed redis port is for debugging purposes.
 All other services are only available in the internal network created by docker-compose (using the service name as hostname).
@@ -111,7 +111,7 @@ services:
 
 The QHAna plugin runner and worker share mostly the same configuration.
 The variables {envvar}`BROKER_URL`, {envvar}`RESULT_BACKEND`, {envvar}`SQLALCHEMY_DATABASE_URI`, and {envvar}`GIT_PLUGINS` **must** be configured to the same values!
-The environemtn variable for {envvar}`CONCURRENCY` can have different values.
+The environment variable for {envvar}`CONCURRENCY` can have different values.
 The worker container must have the environment variable {envvar}`CONTAINER_MODE` set to worker to start the image as a worker (since the exact same image as the plugin runner is used as API server and as worker).
 The user and password set in the `redis` service must be used to construct the {envvar}`SQLALCHEMY_DATABASE_URI` (replace the existing `user:password` section with the changed user and password).
 
@@ -124,7 +124,7 @@ See the console output of these containers for more information.
 The plugin runner and worker and the QHAna backend can be configured by mapping a configuration file into the container.
 The configuration file must be loaded under `/app/instance/config.[json|toml]` for the plugin runner and worker.
 The backend expects the configuration under `/app/data/Config.toml`.
-For the information of what config options are available in the config files please refer to <https://github.com/UST-QuAntiL/qhana-plugin-runner> and <https://github.com/UST-QuAntiL/qhana-backend/blob/main/Config-template.toml>.
+For the information on what config options are available in the config files please refer to <https://github.com/UST-QuAntiL/qhana-plugin-runner> and <https://github.com/UST-QuAntiL/qhana-backend/blob/main/Config-template.toml>.
 
 
 ## Volumes
@@ -136,7 +136,7 @@ To achieve true persistence the `redis` and `postgres` services need to be confi
 Please refer to the image documentations on docker hub for how these volumes should be configured.
 
 The volume named `experiments` is used by the QHAna backend to persist the backend data.
-It contains all data stored for the experiments (as files in the file system) and an sqlite database.
+It contains all data stored for the experiments (as files in the file system) and a sqlite database.
 The backend can also be configured to use a MariaDB database with the `Config.toml` file.
 
 ```yml
@@ -156,11 +156,10 @@ volumes:
 ```
 
 ```{hint}
-As a basic security measure all QHAna containers run as an unpriviledged user.
+As a basic security measure, all QHAna containers run as unprivileged users.
 This can lead to problems with mounting folders into the same space as the volumes.
 This stack overflow question might be a good starting point for researching a solution: https://stackoverflow.com/questions/40462189/docker-compose-set-user-and-group-on-mounted-volume
 
 The QHAna backend uses the user `ballerina` while the plugin runner containers use `gunicorn` as the username.
 For completeness: the QHAna UI runs as the user `nginx`.
 ```
-
