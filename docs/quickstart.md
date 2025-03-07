@@ -1,24 +1,56 @@
 # Quick Start
 
-```{note}
-QHAna can be tested in a local docker-compose setup.
+To use QHAna locally, there are a few requirements to consider:
+
+1. A working installation of `docker compose` (see <https://docs.docker.com/compose/install/>)
+2. Enough free RAM (about 6GB should work for most experiments)
+3. Enough free disk space (10GB should be enough)
+4. A good internet connection
+
+To start qhana locally, clone (or download) the `qhana-docker` repository and use the command `docker compose up` in a terminal.
+The command must be run in the folder that contains the {file}`docker-compose.yml` file.
+
+```{attention}
+The **first start** will take a considerable amount of time before everything is up and running.
+This is because the plugin runner containers download the plugins and their requirements on the first start.
+It can take around **10 to 15 minutes** to install the plugins requirements in the default configuration.
+Keep an eye on the output in the terminal.
 ```
+
+To stop the running containers again focus the terminal and use {kbd}`strg+c` (or {kbd}`ctrl+c` on a mac) to stop the containers.
+This may not stop them immediately but should happen fairly quickly.
+
+```{hint}
+To start the docker compose setup without having to keep the terminal window open, add a `-d` at the end of the command.
+
+`docker compose up -d`
+
+When started like this, use the command `docker compose down` to stop the containers.
+```
+
 
 ## Settings
 
+After starting the docker compose file and waiting for the containers to start, verify that everything is setup correctly in the settings page.
+Open the QHAna UI <http://localhost:8080> and go to the settings page by clicking on the gear icon in the top right corner or directly opening <http://localhost:8080/#/settings> in the browser.
 
-After starting the docker compose file open the QHAna UI and go to the settings page by clicking on the gear icon in the top right corner or directly opening http://localhost:8080/#/settings in the browser.
-All the settings should be configured as in the screenshots below.
+If the plugin registry is running on a different port or on another host, then first change the plugin registry URL.
+The default value of `http://localhost:5000/api/` can be restored by updating the URL with empty values.
+
+Once the plugin registry is up and running, the "Services" card should show the URL `http://localhost:9090` for the QHAna Backend service.
+If the backend has a different address, then click on "all services" and edit the URL.
+
+The plugin runner URL should appear in the "Plugin Seed URLs" card as `http://localhost:5005/`.
+If the plugin runner is using a different URL, then add that URL to the list.
+Seed URLs can also directly point to QHAna plugins for plugins that are not running in a plugin runner.
 
 ![The QHAna settings page.](images/qhana-settings-page.png)
-![The QHAna settings page.](images/qhana-settings-page-2.png)
 
 Navigate back by using the browser history or clicking on the QHAna logo in the top left corner.
 
 ```{hint}
-If you have changed the port of the QHAna backend or are using a different backend, then you can change the backend URL at the top.
-The setting will be saved in the browser local storage on your device.
-To reset this setting just empty all form fields and click on the "Update Backend URL" button.
+If the plugin registry is working, but the QHAna UI refuses to connect, first check if the registry can be reached from your browser by accessing it directly using its URL.
+Second, check if the plugin registry URL in the settings is actually correct and reset this setting to default if required.
 ```
 
 
