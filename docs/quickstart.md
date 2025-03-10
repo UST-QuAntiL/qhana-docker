@@ -205,7 +205,7 @@ The tutorial experiment can also be imported into your QHAna instance.
 
 ## Next Steps
 
-A more complicated experiment demonstartiong the capabilities of QHAna can be found in {doc}`muse`.
+A more complicated experiment demonstrating the capabilities of QHAna can be found in {doc}`muse`.
 
 {doc}`docker-compose` contains a detailed description of the containers defined in the docker-compose file.
 It also contains an overview of the network connectivity for troubleshooting.
