@@ -142,7 +142,7 @@ Two datasets, one for training and one for testing out the training results, hav
 
 In most cases, a preview shows up for the data.
 In some cases, multiple different preview options are available.
-The different otions can be selected using the dropdown to the right of the output name.
+The different options can be selected using the dropdown to the right of the output name.
 Some previews are provided by plugins.
 Those can have additional options that may be hidden in the "Visualization Options" at the top of the preview.
 
