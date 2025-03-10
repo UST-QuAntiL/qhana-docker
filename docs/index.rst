@@ -6,6 +6,7 @@ Welcome to QHAna User Documentation!
     :caption: Contents:
 
     quickstart
+    muse
     installation
     docker-compose
     glossary
