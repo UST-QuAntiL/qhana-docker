@@ -6,7 +6,7 @@ This "Mini MUSE" dataset can be used to showcase a more complicated experiment f
 ## Using the Mini MUSE dataset
 
 ```{warning}
-This workflow description is old and some parts no longer work exactly as escribed in the documents.
+This workflow description is old and some parts no longer work exactly as described in the documents.
 ```
 
 ```{todo}
