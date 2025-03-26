@@ -35,7 +35,7 @@ After starting the docker compose file and waiting for the containers to start, 
 Open the QHAna UI <http://localhost:8080> and go to the settings page by clicking on the gear icon in the top right corner or directly opening <http://localhost:8080/#/settings> in the browser.
 
 If the plugin registry is running on a different port or on another host, then first change the plugin registry URL.
-The default value of `http://localhost:5000/api/` can be restored by updating the URL with empty values.
+The default value of `http://localhost:5006/api/` can be restored by updating the URL with empty values.
 
 ```{hint}
 Troubleshooting the connection to the plugin registry:
@@ -44,7 +44,7 @@ Troubleshooting the connection to the plugin registry:
 2. Check if the plugin registry URL displayed in the settings is actually correct (the same as the URL that works in 1.) and reset this setting to default if required.
 ```
 
-Once the plugin registry is up and running, the "Services" card should show the URL `http://localhost:9090` for the QHAna Backend service.
+Once the plugin registry is up and running, the "Services" card should show the URL `http://localhost:9091` for the QHAna Backend service.
 If the backend has a different address, then click on "all services" and edit the URL.
 
 The plugin runner URL should appear in the "Plugin Seed URLs" card as `http://localhost:5005/`.
@@ -199,7 +199,7 @@ The tutorial experiment can also be imported into your QHAna instance.
 1. Download the experiment {download}`Tutorial.zip <experiments/Tutorial.zip>`.
 2. Go to the experiments overview page.
 3. Click on "import" and select the downloaded file from 1.
-4. Optionally rename the imported experiment, if you already have a "Tutarial" experiment.
+4. Optionally rename the imported experiment, if you already have a "Tutorial" experiment.
 ```
 
 
