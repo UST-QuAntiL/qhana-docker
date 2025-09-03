@@ -36,7 +36,9 @@ Click the wrench icon.
 
 ![Click wrench icon.](images/workflow-editor/add_qhana_task3.png)
 
+You can either search for the plugin name or navigate through the list "QHAna Tasks" -> "QHAna Service Tasks".
 Select the "hello-world" plugin to convert this task to the QHAna service task for the "hello-world" plugin.
+You could also use the "CUSTOM" QHAna service task and enter the details manually.
 
 ![Select hello-world.](images/workflow-editor/add_qhana_task4.png)
 
@@ -48,7 +50,9 @@ Now, we will configure the tasks. Select the user input task and select the "Gen
 
 ![Select "Generated Task Forms" as forms type in the user task.](images/workflow-editor/select_forms_type.png)
 
-In the "Form fields" category, click on the plus to create a new field and add as ID "qouput.inputHelloWorld". The "qouput." prefix is used for all process variables that will contain the output value of a task.
+In the "Form fields" category, click on the plus to create a new field and add as ID "qouput.inputHelloWorld".
+For QHAna tasks the "qouput." prefix is used for all process variables that will contain the output value of said QHAna task.
+For the form we define here, however, it is not necessary, but we use it for consistency.
 
 ![Configure the form field.](images/workflow-editor/configure_form_field.png)
 
@@ -56,11 +60,12 @@ Click on the hello-world task and add an input with the plus icon. Use "qinput.i
 
 ![Configure hello-world input.](images/workflow-editor/configure_hello_world_input.png)
 
-Add an output with "result.qoutput.helloWorldResult" as process variable name. The prefix "result.qoutput." is used for all outputs that should be the output of the whole workflow. Select "String or expression" as assignment type and "${output}" as value to assign the output of the plugin to the process variable.
+Add an output with "result.qoutput.helloWorldResult" as process variable name. The prefix "result." marks this variable as a workflow result and ".qoutput" as QHAna plugin output. Select "String or expression" as assignment type and "${output}" as value to assign the output of the plugin to the process variable.
 
 ![Configure hello-world output.](images/workflow-editor/configure_hello_world_output.png)
 
 To transform this workflow into an executable workflow, click on the wrench icon to the right of the "Transformation" button and make sure only "DataFlow Transformation" and "QHAna Transformation" are active.
+After the transformation the name of the workflow is appended with "_transformed" to indicated that it was already transformed, but you can change the name as shown in the beginning.
 
 ![Configure transformation.](images/workflow-editor/configure_transformation.png)
 
@@ -78,7 +83,7 @@ Now, we will deploy the workflow as a plugin by clicking on "Deploy Workflow" an
 
 ## Workflow Plugin
 
-Find the plugin with your chosen plugin name and the suffix "_transformed" in the plugin list and click on "submit" to execute the workflow.
+Go back to the experiment workspace to find the plugin with your chosen workflow name and the suffix "_transformed" (if you didn't change it) in the plugin list and click on "submit" to execute the workflow.
 
 ![Start workflow.](images/workflow-editor/start_workflow.png)
 
