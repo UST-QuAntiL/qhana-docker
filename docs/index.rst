@@ -7,6 +7,7 @@ Welcome to QHAna User Documentation!
 
     quickstart
     muse
+    workflows
     installation
     docker-compose
     glossary
