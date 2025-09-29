@@ -1,5 +1,6 @@
 services:
   qhana-plugin-runner:
+    profiles: ["plugin-runner"]
     image: ghcr.io/ust-quantil/qhana-plugin-runner:main
     depends_on:
       - minio
@@ -59,6 +60,7 @@ services:
   muse-db:
     image: ghcr.io/ust-quantil/mini-muse:main
   worker:
+    profiles: ["plugin-runner"]
     image: ghcr.io/ust-quantil/qhana-plugin-runner:main
     depends_on:
       - qhana-plugin-runner
