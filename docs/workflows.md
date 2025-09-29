@@ -81,6 +81,19 @@ Now, we will deploy the workflow as a plugin by clicking on "Deploy Workflow" an
 
 ![Deploy as plugin.](images/workflow-editor/deploy_as_plugin.png)
 
+### Excursion: File outputs from previous steps as input
+
+If a step has produced a file as output and you want to use it as input for a later step as input you have to create a input with "Map" assignment type.
+In the map entries you have to specify a "from" key to define from which process variable you want the output file.
+Then you can use multiple filters to specify which file exactly you want if the process variable contains multiple files.
+You can filter by file name if you add a "name" key and add the name as value.
+This filter supports glob notation e.g. you can use "*" to indicate zero or more arbitrary characters.
+To filter by data type you can add a "dataType" key and add the data type as value.
+The same applies to "contentType".
+
+![Add file input.](images/workflow-editor/file_input.png)
+
+
 ## Workflow Plugin
 
 Go back to the experiment workspace to find the plugin with your chosen workflow name and the suffix "_transformed" (if you didn't change it) in the plugin list and click on "submit" to execute the workflow.
