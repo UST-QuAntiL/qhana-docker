@@ -87,10 +87,10 @@ If a step has produced a file as output and you want to use it as input for a la
 In the map entries you have to specify a "from" key to define from which process variable you want the output file.
 Then you have to use at least one filter to specify which file exactly you want from the process variable.
 You can filter by file name if you add a "name" key and add the name as value.
-This filter supports glob notation e.g. you can use "*" to indicate zero or more arbitrary characters.
+This filter supports glob notation e.g. you can use `*` to indicate zero or more arbitrary characters.
 To filter by data type you can add a "dataType" key and add the data type as value.
-You can use "*" here as well, but only to replace an entire side e.g. "entity/*".
-For "contentType" you can add a filter that allows multiple content types by using JSON list notation or by separating them with white space e.g. '["application/json", "text/html"]' or "application/json text/html".
+You can use `*` here as well, but only to replace an entire side e.g. `entity/*`.
+For "contentType" you can add a filter that allows multiple content types by using JSON list notation or by separating them with white space e.g. `["application/json", "text/html"]` or `application/json text/html`.
 
 ![Add file input.](images/workflow-editor/file_input.png)
 
