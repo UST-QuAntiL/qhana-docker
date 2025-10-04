@@ -319,7 +319,6 @@ services:
   # For the pattern-atlas plugin
   pattern-atlas-api:
     image: patternatlas/pattern-atlas-api:latest
-    profiles: [ "patternAtlas" ]
     environment:
       JDBC_DATABASE_URL: postgres-pattern-atlas
       JDBC_DATABASE_PORT: 5432
@@ -345,7 +344,6 @@ services:
       - latex-renderer
   pattern-atlas-ui:
     image: patternatlas/pattern-atlas-ui:latest
-    profiles: [ "patternAtlas" ]
     # depends_on:
     #   - config-server
     environment:
@@ -362,7 +360,6 @@ services:
       - default
   postgres-pattern-atlas:
     image: "postgres:latest"
-    profiles: [ "patternAtlas" ]
     ports:
       - "5061:5432"
     environment:
@@ -373,7 +370,6 @@ services:
       - default
   latex-renderer:
     image: planqk/latex-renderer:latest
-    profiles: [ "patternAtlas" ]
     ports:
       - "5030:5030"
     networks:
