@@ -315,6 +315,69 @@ services:
     command: -p 5060
     ports:
       - "5060:5060"
+
+  # For the pattern-atlas plugin
+  pattern-atlas-api:
+    image: patternatlas/pattern-atlas-api:latest
+    profiles: [ "patternAtlas" ]
+    environment:
+      JDBC_DATABASE_URL: postgres-pattern-atlas
+      JDBC_DATABASE_PORT: 5432
+      JDBC_DATABASE_NAME: patternatlas
+      JDBC_DATABASE_USERNAME: patternatlas
+      JDBC_DATABASE_PASSWORD: patternatlas
+      DB_INIT_PASSWORD: patternatlas
+      DB_INIT_USER: patternatlas
+      LATEX_RENDERER_HOST_NAME: latex-renderer
+      LATEX_RENDERER_PORT: 5030
+      API_PORT: 1977
+      PATTERN_ATLAS_FETCH_INITIAL_DATA: 'true'
+      # HAL_EXPLORER: 'false'
+      # activate correct application properties
+      # SPRING_PROFILES_ACTIVE: docker
+      # SECURITY_LOGLEVEL: info
+    ports:
+      - '1977:1977'
+    networks:
+      - default
+    depends_on:
+      - postgres-pattern-atlas
+      - latex-renderer
+  pattern-atlas-ui:
+    image: patternatlas/pattern-atlas-ui:latest
+    profiles: [ "patternAtlas" ]
+    # depends_on:
+    #   - config-server
+    environment:
+      # because the requests are performed from the browser and not
+      # from the container itself we have to specify localhost here
+      # and **not** the container name
+      PATTERN_ATLAS_API_HOST_NAME: localhost
+      PATTERN_ATLAS_API_PORT: 1977
+      LATEX_RENDERER_HOST_NAME: localhost
+      LATEX_RENDERER_PORT: 5030
+    ports:
+      - "1978:80"
+    networks:
+      - default
+  postgres-pattern-atlas:
+    image: "postgres:latest"
+    profiles: [ "patternAtlas" ]
+    ports:
+      - "5061:5432"
+    environment:
+      POSTGRES_USER: patternatlas
+      POSTGRES_PASSWORD: patternatlas
+      POSTGRES_DB: patternatlas
+    networks:
+      - default
+  latex-renderer:
+    image: planqk/latex-renderer:latest
+    profiles: [ "patternAtlas" ]
+    ports:
+      - "5030:5030"
+    networks:
+      - default
       
 volumes:
   minio:
