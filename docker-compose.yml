@@ -343,6 +343,7 @@ services:
       - postgres-pattern-atlas
       - latex-renderer
   pattern-atlas-ui:
+    profiles: ["pattern-atlas-ui"]
     image: patternatlas/pattern-atlas-ui:latest
     # depends_on:
     #   - config-server
