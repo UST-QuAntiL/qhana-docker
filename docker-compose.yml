@@ -338,6 +338,8 @@ services:
       POSTGRES_USER: leqo
       POSTGRES_PASSWORD: unsave_passwd
       POSTGRES_DB: qasm
+    ports:
+      - "5434:5432"
     # restart: unless-stopped
     volumes:
       - leqo-data:/var/lib/postgresql/data
