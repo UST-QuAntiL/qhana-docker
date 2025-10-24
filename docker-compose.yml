@@ -19,7 +19,7 @@ services:
       PLUGIN_REGISTRY_URL: "http://localhost:5006/api/"
       DEFAULT_FILE_STORE: "minio"
       MINIO_CLIENT: '{"endpoint": "localhost:9000", "access_key": "QHANA", "secret_key": "QHANAQHANA", "secure": false}'
-      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":5005 :5006 :5007 :5080 :9000 :9001 :9091 ${EXTRA_PROXY_PORTS}"
+      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":5005 :5006 :5007 :5080 :8081 :8082 :8083 :8084 :8085 :9000 :9001 :9091 ${EXTRA_PROXY_PORTS}"
       GIT_PLUGINS: &git-plugins "git+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@main#subdirectory=/stable_plugins\ngit+https://github.com/UST-QuAntiL/nisq-analyzer-prio-service.git@master#subdirectory=/plugins"
       PLUGIN_FOLDERS: &plugin-folders ./git-plugins:./git-plugins/classical_ml/data_preparation:./git-plugins/classical_ml/scikit_ml:./git-plugins/data_synthesis:./git-plugins/demo:./git-plugins/file_utils:./git-plugins/infrastructure:./git-plugins/muse:./git-plugins/nisq_analyzer:./git-plugins/quantum_ml/max_cut:./git-plugins/quantum_ml/pennylane_qiskit_ml:./git-plugins/quantum_ml/qiskit_ml:./git-plugins/visualization/complex:./git-plugins/visualization/file_types:./git-plugins/workflow
       CAMUNDA_API_URL: "http://localhost:5080/engine-rest"
