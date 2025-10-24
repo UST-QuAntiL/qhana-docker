@@ -1,5 +1,6 @@
 services:
   qhana-plugin-runner:
+    profiles: ["qhana", "all"]
     image: ghcr.io/ust-quantil/qhana-plugin-runner:main
     depends_on:
       - minio
@@ -28,10 +29,12 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
   redis:
+    profiles: ["qhana", "qunicorn", "all"]
     image: "redis:latest"
     ports:
       - "6379:6379"
   postgres:
+    profiles: ["qhana", "all"]
     image: "postgres:latest"
     ports:
       - "5432:5432"
@@ -40,6 +43,7 @@ services:
       POSTGRES_USER: user
       POSTGRES_DB: default_db
   postgres-registry:
+    profiles: ["qhana", "all"]
     image: "postgres:latest"
     ports:
       - "5433:5432"
@@ -48,6 +52,7 @@ services:
       POSTGRES_USER: user
       POSTGRES_DB: default_db
   minio:
+    profiles: ["qhana", "all"]
     image: quay.io/minio/minio
     command: server /data --console-address ":9001"
     volumes:
@@ -59,8 +64,10 @@ services:
       - "9000:9000"
       - "9001:9001"
   muse-db:
+    profiles: ["qhana", "all"]
     image: ghcr.io/ust-quantil/mini-muse:main
   worker:
+    profiles: ["qhana", "all"]
     image: ghcr.io/ust-quantil/qhana-plugin-runner:main
     depends_on:
       - qhana-plugin-runner
@@ -89,6 +96,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
   backend:
+    profiles: ["qhana", "all"]
     image: ghcr.io/ust-quantil/qhana-backend:main
     volumes:
       - experiments:/app/data
@@ -100,6 +108,7 @@ services:
     ports:
       - 9091:9090
   ui:
+    profiles: ["qhana", "all"]
     image: ghcr.io/ust-quantil/qhana-ui:main
     ports:
       - 8080:8080
@@ -111,6 +120,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
   registry:
+    profiles: ["qhana", "all"]
     image: ghcr.io/ust-quantil/qhana-plugin-registry:main
     ports:
       - "5006:8080"
@@ -133,6 +143,7 @@ services:
           {"serviceId": "qunicorn", "name": "Qunicorn", "url": "http://localhost:8081"}
         ]'
   registry-worker:
+    profiles: ["qhana", "all"]
     image: ghcr.io/ust-quantil/qhana-plugin-registry:main
     ports:
       - "5007:8080"
