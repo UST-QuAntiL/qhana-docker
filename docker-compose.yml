@@ -384,12 +384,43 @@ services:
     command: -p 5060
     ports:
       - "5060:5060"
-      
+
+  ## Low-Code 
+  leqo-backend:
+    image: ghcr.io/leqo-framework/leqo-backend:0.1.0
+    environment:
+      POSTGRES_USER: leqo
+      POSTGRES_PASSWORD: unsave_passwd
+      POSTGRES_DB: qasm
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: postgres-backend
+      SQLALCHEMY_DRIVER: postgresql+psycopg
+    profiles: ["lowcode", "all"]
+    restart: unless-stopped
+    depends_on:
+      - postgres-backend
+    ports:
+      - "8000:80"
+  postgres-backend:
+    image: postgres:latest
+    profiles: ["lowcode", "all"]
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: leqo
+      POSTGRES_PASSWORD: unsave_passwd
+      POSTGRES_DB: qasm
+    restart: unless-stopped
+    volumes:
+      - db-data:/var/lib/postgresql
+    ports:
+      - "5435:5432"
+
 volumes:
   minio:
   instance:
   experiments:
   exec_data:
+  db-data:
 networks:
   default:
     driver: bridge
