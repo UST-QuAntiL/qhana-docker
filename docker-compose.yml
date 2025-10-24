@@ -127,7 +127,11 @@ services:
       SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://user:password@host.docker.internal:5433/default_db"
       LOCALHOST_PROXY_PORTS: *localhost-proxy-ports
       INITIAL_PLUGIN_SEEDS: "http://localhost:5005"
-      PRECONFIGURED_SERVICES: '[{"serviceId": "qhana-backend", "name": "Backend", "url": "http://localhost:9091"}]'
+      PRECONFIGURED_SERVICES: '[
+          {"serviceId": "qhana-backend", "name": "Backend", "url": "http://localhost:9091"},
+          {"serviceId": "camunda", "name": "Camunda", "url": "http://localhost:5080/engine-rest"},
+          {"serviceId": "qunicorn", "name": "Qunicorn", "url": "http://localhost:8081"}
+        ]'
   registry-worker:
     image: ghcr.io/ust-quantil/qhana-plugin-registry:main
     ports:
@@ -150,12 +154,53 @@ services:
 
   # For Workflows
   camunda:
-    profiles: ["workflow"]
+    profiles: ["workflow", "all"]
     image: camunda/camunda-bpm-platform:run-latest
     ports:
       - '5080:8080'
     networks:
       - default
+
+  # Qunicorn
+  qunicorn-server:
+    profiles: ["qunicorn", "all"]
+    image: ghcr.io/qunicorn/qunicorn-core:main
+    environment:
+      CONTAINER_MODE: server
+      SERVER_PORT: 8080
+      BROKER_URL: "redis://redis:6379"
+      DB_URL: "postgresql+psycopg://user:passwd@qunicorn-db/qunicorn"
+      # JWKS_URL: "http://keycloak:8080/auth/realms/qunicorn/protocol/openid-connect/certs"
+      NUMBA_CACHE_DIR: "/app/cache"
+    depends_on:
+      - qunicorn-db
+      - redis
+    ports:
+      - "8081:8080"
+  qunicorn-worker:
+    profiles: ["qunicorn", "all"]
+    image: ghcr.io/qunicorn/qunicorn-core:main
+    environment:
+      CONTAINER_MODE: worker
+      BROKER_URL: "redis://redis:6379"
+      DB_URL: "postgresql+psycopg://user:passwd@qunicorn-db/qunicorn"
+      NUMBA_CACHE_DIR: "/app/cache"
+      # QMWARE_API_KEY: ""
+      # QMWARE_API_KEY_ID: ""
+    depends_on:
+      - qunicorn-db
+      - redis
+    ports:
+      - "6379"
+  qunicorn-db:
+    profiles: ["qunicorn", "all"]
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_USER: user
+      POSTGRES_DB: qunicorn
+    ports:
+      - "5434:5432"
 
   # For NISQ-Analyzer plugin
   nisq-analyzer-ui:
