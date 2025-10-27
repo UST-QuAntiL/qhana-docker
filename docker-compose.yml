@@ -20,11 +20,13 @@ services:
       PLUGIN_REGISTRY_URL: "http://localhost:5006/api/"
       DEFAULT_FILE_STORE: "minio"
       MINIO_CLIENT: '{"endpoint": "localhost:9000", "access_key": "QHANA", "secret_key": "QHANAQHANA", "secure": false}'
-      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":5005 :5006 :5007 :5080 :8081 :8082 :8083 :8084 :8085 :9000 :9001 :9091 ${EXTRA_PROXY_PORTS}"
-      GIT_PLUGINS: &git-plugins "git+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@main#subdirectory=/stable_plugins\ngit+https://github.com/UST-QuAntiL/nisq-analyzer-prio-service.git@master#subdirectory=/plugins"
-      PLUGIN_FOLDERS: &plugin-folders ./git-plugins:./git-plugins/classical_ml/data_preparation:./git-plugins/classical_ml/scikit_ml:./git-plugins/data_synthesis:./git-plugins/demo:./git-plugins/file_utils:./git-plugins/infrastructure:./git-plugins/muse:./git-plugins/nisq_analyzer:./git-plugins/quantum_ml/max_cut:./git-plugins/quantum_ml/pennylane_qiskit_ml:./git-plugins/quantum_ml/qiskit_ml:./git-plugins/visualization/complex:./git-plugins/visualization/file_types:./git-plugins/workflow
+      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":1977 :5005 :5006 :5007 :5030 :5080 :6626 :8000 :8081 :8082 :8083 :8084 :8085 :8098 :9000 :9001 :9091 ${EXTRA_PROXY_PORTS}"
+      GIT_PLUGINS: &git-plugins "git+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@main#subdirectory=/stable_plugins\ngit+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@feature/pattern-atlas#subdirectory=/stable_plugins/pattern_atlas\ngit+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@feature/low-code-modeler#subdirectory=/stable_plugins/low_code_modeler"
+      PLUGIN_FOLDERS: &plugin-folders ./git-plugins:./git-plugins/classical_ml/data_preparation:./git-plugins/classical_ml/scikit_ml:./git-plugins/data_synthesis:./git-plugins/demo:./git-plugins/file_utils:./git-plugins/infrastructure:./git-plugins/muse:./git-plugins/quantum_ml/max_cut:./git-plugins/quantum_ml/pennylane_qiskit_ml:./git-plugins/quantum_ml/qiskit_ml:./git-plugins/visualization/complex:./git-plugins/visualization/file_types:./git-plugins/workflow:./git-plugins/pattern_atlas:./git-plugins/low_code_modeler
       CAMUNDA_API_URL: "http://localhost:5080/engine-rest"
       CAMUNDA_WORKER_ID: "6756b650-033c-4815-948b-fbae08453a9f"
+      LCM_QunicornEndpoint: "http://localhost:5081"
+      LCM_PatternAtlasApiEndpoint: "http://localhost:1977/patternatlas/patternLanguages/af7780d5-1f97-4536-8da7-4194b093ab1d"
       NISQ_ANALYZER_UI_URL: "http://localhost:5009"
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -92,6 +94,8 @@ services:
       PLUGIN_FOLDERS: *plugin-folders
       CAMUNDA_API_URL: "http://localhost:5080/engine-rest"
       CAMUNDA_WORKER_ID: "6756b650-033c-4815-948b-fbae08453a9f"
+      LCM_QunicornEndpoint: "http://localhost:5081"
+      LCM_PatternAtlasApiEndpoint: "http://localhost:1977/patternatlas/patternLanguages/af7780d5-1f97-4536-8da7-4194b093ab1d"
       NISQ_ANALYZER_UI_URL: "http://localhost:5009"
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -139,8 +143,11 @@ services:
       INITIAL_PLUGIN_SEEDS: "http://localhost:5005"
       PRECONFIGURED_SERVICES: '[
           {"serviceId": "qhana-backend", "name": "Backend", "url": "http://localhost:9091"},
+          {"serviceId": "latex-renderer", "name": "LaTeX Renderer", "url": "http://localhost:5030"},
           {"serviceId": "camunda", "name": "Camunda", "url": "http://localhost:5080/engine-rest"},
-          {"serviceId": "qunicorn", "name": "Qunicorn", "url": "http://localhost:8081"}
+          {"serviceId": "qunicorn", "name": "Qunicorn", "url": "http://localhost:8081"},
+          {"serviceId": "low-code-backend", "name": "Low-Code Backend", "url": "http://localhost:8000"},
+          {"serviceId": "pattern-atlas", "name": "Pattern Atlas", "url": "http://localhost:1977"}
         ]'
   registry-worker:
     profiles: ["qhana", "all"]
@@ -172,6 +179,8 @@ services:
     networks:
       - default
 
+
+
   # Qunicorn
   qunicorn-server:
     profiles: ["qunicorn", "all"]
@@ -196,8 +205,6 @@ services:
       BROKER_URL: "redis://redis:6379"
       DB_URL: "postgresql+psycopg://user:passwd@qunicorn-db/qunicorn"
       NUMBA_CACHE_DIR: "/app/cache"
-      # QMWARE_API_KEY: ""
-      # QMWARE_API_KEY_ID: ""
     depends_on:
       - qunicorn-db
       - redis
@@ -213,180 +220,11 @@ services:
     ports:
       - "5434:5432"
 
-  # For NISQ-Analyzer plugin
-  nisq-analyzer-ui:
-    profiles: ["nisq"]
-    image: planqk/nisq-analyzer-ui:latest
-    depends_on:
-      - nisq-analyzer-db
-    environment:
-      NISQ_ANALYZER_HOST_NAME: localhost
-      NISQ_ANALYZER_PORT: 5010
-    ports:
-      - '5009:80'
-    networks:
-      - default
-  nisq-analyzer:
-    profiles: ["nisq"]
-    image: planqk/nisq-analyzer:without-qprov
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    environment:
-      POSTGRES_HOSTNAME: nisq-analyzer-db
-      POSTGRES_PORT: 5060
-      POSTGRES_USER: nisq
-      POSTGRES_PASSWORD: nisq
-      POSTGRES_DB: nisq
 
-      # activate correct application properties
-      SPRING_PROFILES_ACTIVE: docker
-
-      TRANSLATOR_HOSTNAME: quantum-transpiler
-      TRANSLATOR_PORT: 5012
-      # Configuration of the SDK Connector Services
-      QISKIT_HOSTNAME: qiskit-service
-      QISKIT_PORT: 5013
-      FOREST_HOSTNAME: forest-service
-      FOREST_PORT: 5014
-      PYTKET_HOSTNAME: pytket-service
-      PYTKET_PORT: 5015
-      # Configure Prioritization Service connection
-      PRIORITIZATION_HOSTNAME: qhana-plugin-runner
-      PRIORITIZATION_PORT: 8080
-    ports:
-      - '5010:5010'
-    networks:
-      - default
-
-  qiskit-service:
-    image: planqk/qiskit-service:latest
-    profiles: ["nisq"]
-    command: sh /app/startup.sh
-    ports:
-      - "5013:5013"
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=sqlite:////data/app.db
-    volumes:
-      - exec_data:/data
-    networks:
-      - default
-
-  qiskit-rq-worker:
-    image: planqk/qiskit-service:latest
-    profiles: ["nisq"]
-    command: rq worker --url redis://redis:6379 qiskit-service_execute
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=sqlite:////data/app.db
-    volumes:
-      - exec_data:/data
-    depends_on:
-      - redis
-    deploy:
-      replicas: 2
-  
-  forest-service:
-    image: planqk/forest-service:latest
-    profiles: ["nisq"]
-    command: sh /app/startup.sh
-    ports:
-      - "5014:5014"
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=sqlite:////data/app.db
-      - QVM_HOSTNAME=rigetti-qvm
-      - QVM_PORT=5016
-      - QUILC_HOSTNAME=rigetti-quilc
-      - QUILC_PORT=5017
-    volumes:
-      - exec_data:/data
-    networks:
-      - default
-
-  forest-rq-worker:
-    image: planqk/forest-service:latest
-    profiles: ["nisq"]
-    command: rq worker --url redis://redis:6379 forest-service_execute
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=sqlite:////data/app.db
-      - QVM_HOSTNAME=rigetti-qvm
-      - QVM_PORT=5016
-      - QUILC_HOSTNAME=rigetti-quilc
-      - QUILC_PORT=5017
-    volumes:
-      - exec_data:/data
-    depends_on:
-      - redis
-    networks:
-      - default
-
-  pytket-service:
-    image: planqk/pytket-service:latest
-    profiles: ["nisq"]
-    command: sh /app/startup.sh
-    ports:
-      - "5015:5015"
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=sqlite:////data/app.db
-      - QVM_HOSTNAME=rigetti-qvm
-      - QVM_PORT=5016
-    volumes:
-      - exec_data:/data
-    networks:
-      - default
-
-  pytket-rq-worker:
-    image: planqk/pytket-service:latest
-    profiles: ["nisq"]
-    command: rq worker --url redis://redis:6379 pytket-service_execute
-    environment:
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=sqlite:////data/app.db
-      - QVM_HOSTNAME=rigetti-qvm
-      - QVM_PORT=5016
-    volumes:
-      - exec_data:/data
-    depends_on:
-      - redis
-    networks:
-      - default
-        
-  rigetti-qvm:
-    image: rigetti/qvm
-    profiles: ["nisq"]
-    ports:
-      - "5016:5016"
-    command: -S -p 5016
-    networks:
-      - default
-
-  rigetti-quilc:
-    image: rigetti/quilc
-    profiles: ["nisq"]
-    ports:
-      - "5017:5017"
-    command: -S -p 5017
-    networks:
-      - default
-
-  nisq-analyzer-db:
-    build:
-      context: nisq-analyzer-db
-      dockerfile: Dockerfile
-    profiles: ["nisq"]
-    environment:
-      POSTGRES_PASSWORD: nisq
-      POSTGRES_USER: nisq
-      POSTGRES_DB: nisq
-    command: -p 5060
-    ports:
-      - "5060:5060"
 
   ## Low-Code 
   leqo-backend:
+    profiles: ["lowcode", "all"]
     image: ghcr.io/leqo-framework/leqo-backend:0.1.0
     environment:
       POSTGRES_USER: leqo
@@ -395,32 +233,71 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_HOST: postgres-backend
       SQLALCHEMY_DRIVER: postgresql+psycopg
-    profiles: ["lowcode", "all"]
-    restart: unless-stopped
     depends_on:
       - postgres-backend
     ports:
       - "8000:80"
   postgres-backend:
-    image: postgres:latest
     profiles: ["lowcode", "all"]
+    image: postgres:latest
     shm_size: 128mb
     environment:
       POSTGRES_USER: leqo
       POSTGRES_PASSWORD: unsave_passwd
       POSTGRES_DB: qasm
-    restart: unless-stopped
-    volumes:
-      - db-data:/var/lib/postgresql
     ports:
       - "5435:5432"
+
+
+
+  pattern-atlas-api:
+    profiles: ["patterns", "all"]
+    image: patternatlas/pattern-atlas-api:v1.9.0
+    environment:
+      JDBC_DATABASE_URL: db
+      JDBC_DATABASE_USERNAME: patternatlas
+      JDBC_DATABASE_PASSWORD: patternatlas
+      JDBC_DATABASE_PORT: 5436
+      DB_INIT_USER: patternatlas
+      DB_INIT_PASSWORD: patternatlas
+      LATEX_RENDERER_HOST_NAME: latex-renderer
+      LATEX_RENDERER_PORT: 5436
+      JDBC_DATABASE_NAME: patternatlas
+      PATTERN_ATLAS_FETCH_INITIAL_DATA: 'true'
+      HAL_EXPLORER: 'false'
+      PATTERNATLAS_CONTENT_REPOSITORY_BRANCH: 'feature/tages-fixes'
+      # activate correct application properties
+      SPRING_PROFILES_ACTIVE: docker
+      SECURITY_LOGLEVEL: info
+    ports:
+      - "1977:1977"
+    depends_on:
+      - postgres-patterns
+      - latex-renderer
+
+  latex-renderer:
+    profiles: ["patterns", "all"]
+    image: planqk/latex-renderer:v1.1.1
+    platform: linux/amd64
+    ports:
+      - "5030:5030"
+  postgres-patterns:
+    profiles: ["patterns", "all"]
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: patternatlas
+      POSTGRES_PASSWORD: patternatlas
+      POSTGRES_DB: patternatlas
+    ports:
+      - "5436:5432"
+
+
 
 volumes:
   minio:
   instance:
   experiments:
   exec_data:
-  db-data:
 networks:
   default:
     driver: bridge
