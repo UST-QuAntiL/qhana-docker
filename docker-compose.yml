@@ -254,7 +254,7 @@ services:
     profiles: ["patterns", "all"]
     image: patternatlas/pattern-atlas-api:v1.9.0
     environment:
-      JDBC_DATABASE_URL: db
+      JDBC_DATABASE_URL: postgres-patterns
       JDBC_DATABASE_USERNAME: patternatlas
       JDBC_DATABASE_PASSWORD: patternatlas
       JDBC_DATABASE_PORT: 5436
