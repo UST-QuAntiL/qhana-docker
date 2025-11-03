@@ -225,7 +225,7 @@ services:
   ## Low-Code 
   leqo-backend:
     profiles: ["lowcode", "all"]
-    image: ghcr.io/leqo-framework/leqo-backend:0.1.0
+    image: ghcr.io/leqo-framework/leqo-backend:0.2
     environment:
       POSTGRES_USER: leqo
       POSTGRES_PASSWORD: unsave_passwd
@@ -233,6 +233,7 @@ services:
       POSTGRES_PORT: 5432
       POSTGRES_HOST: postgres-backend
       SQLALCHEMY_DRIVER: postgresql+psycopg
+      QISKIT_COMPAT_MODE: TRUE
     depends_on:
       - postgres-backend
     ports:
