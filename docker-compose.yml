@@ -1,4 +1,89 @@
+# Settings and configurations that are common for all containers
+x-minio-common: &minio-common
+  # breaking changes in later versions
+  image: quay.io/minio/minio:RELEASE.2022-01-27T03-53-02Z
+  command: server --console-address ":9001"  http://minio{1...2}/data{1...2}
+  expose:
+    - "9000"
+    - "9001"
+  environment:
+    MINIO_ROOT_USER: minio
+    MINIO_ROOT_PASSWORD: minio123
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval: 30s
+    timeout: 20s
+    retries: 3
+
+
 services:
+  
+ ### Camunda Engine ###
+  camunda-engine:
+    image: planqk/camunda-process-view-plugins:v1.0.4
+    ports:
+      - 8090:8080
+    networks:
+      - default
+
+  workflow-modeler:
+    image: planqk/workflow-modeler:v1.5.4
+    environment:
+      CAMUNDA_ENDPOINT: http://localhost:8090/engine-rest
+      ENABLE_DATA_FLOW_PLUGIN: 'false'
+      ENABLE_OPENTOSCA_PLUGIN: 'true'
+      ENABLE_PATTERN_PLUGIN: 'true'
+      ENABLE_PLANQK_PLUGIN: 'false'
+      ENABLE_QHANA_PLUGIN: 'false'
+      ENABLE_QUANTME_PLUGIN: 'true'
+      OPENTOSCA_ENDPOINT: http://localhost:1337/csars
+      PATTERN_ATLAS_ENDPOINT: http://localhost:1977/patternatlas/patternLanguages/af7780d5-1f97-4536-8da7-4194b093ab1d
+      PATTERN_ATLAS_UI_ENDPOINT: http://localhost:1978
+      QC_ATLAS_ENDPOINT: http://localhost:6626
+      QPROV_ENDPOINT: http://localhost:8094/qprov
+      QRM_USERNAME: UST-QuAntiL
+      QRM_REPONAME: QuantME-UseCases
+      QRM_REPOPATH: 2025-icse/qrms-docker
+      SCRIPT_SPLITTER_ENDPOINT: http://localhost:8891
+      WINERY_ENDPOINT: http://localhost:8093/winery
+    ports:
+      - 1893:8080
+    networks:
+      - default
+
+
+  ### Database ###
+  db:
+    build:
+      context: ./db
+    environment:
+      POSTGRES_USERS: 'planqk:planqk|patternatlas:patternatlas|qprov:qprov'
+      POSTGRES_DATABASES: 'planqk:planqk|patternatlas:patternatlas|qprov:qprov'
+      QC_ATLAS_CONTENT_REPOSITORY_BRANCH: 'master'
+      ATLAS_DB: planqk
+      PATTERNATLAS_DB: patternatlas
+    ports:
+      - '5060:5060'
+    networks:
+      - default
+
+
+  ### QC Atlas ###
+  qc-atlas:
+    image: planqk/atlas:v3.1.4
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOSTNAME: db
+      POSTGRES_PORT: 5060
+      POSTGRES_USER: planqk
+      POSTGRES_PASSWORD: planqk
+      POSTGRES_DB: planqk
+    ports:
+      - "6626:6626"
+    networks:
+      - default
+
   qhana-plugin-runner:
     profiles: ["plugin-runner"]
     image: ghcr.io/ust-quantil/qhana-plugin-runner:main
@@ -19,7 +104,7 @@ services:
       SQLALCHEMY_DATABASE_URI: "postgresql+psycopg2://user:password@host.docker.internal:5432/default_db"
       DEFAULT_FILE_STORE: "minio"
       MINIO_CLIENT: '{"endpoint": "localhost:9000", "access_key": "QHANA", "secret_key": "QHANAQHANA", "secure": false}'
-      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":5005 :5006 :5007 :9000 :9001 :9091 ${EXTRA_PROXY_PORTS}"
+      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":5005 :5006 :5007 :9000 :9001 :9091"
       GIT_PLUGINS: &git-plugins "git+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@main#subdirectory=/stable_plugins\ngit+https://github.com/UST-QuAntiL/nisq-analyzer-prio-service.git@master#subdirectory=/plugins"
       PLUGIN_FOLDERS: &plugin-folders ./git-plugins:./git-plugins/classical_ml/data_preparation:./git-plugins/classical_ml/scikit_ml:./git-plugins/data_synthesis:./git-plugins/demo:./git-plugins/file_utils:./git-plugins/infrastructure:./git-plugins/muse:./git-plugins/nisq_analyzer:./git-plugins/quantum_ml/max_cut:./git-plugins/quantum_ml/pennylane_qiskit_ml:./git-plugins/quantum_ml/qiskit_ml:./git-plugins/visualization/complex:./git-plugins/visualization/file_types:./git-plugins/workflow
       NISQ_ANALYZER_UI_URL: http://localhost:5009
