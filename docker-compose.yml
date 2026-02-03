@@ -1,4 +1,83 @@
+# Settings and configurations that are common for all containers
+x-minio-common: &minio-common
+  # breaking changes in later versions
+  image: quay.io/minio/minio:RELEASE.2022-01-27T03-53-02Z
+  command: server --console-address ":9001"  http://minio{1...2}/data{1...2}
+  expose:
+    - "9000"
+    - "9001"
+  environment:
+    MINIO_ROOT_USER: minio
+    MINIO_ROOT_PASSWORD: minio123
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval: 30s
+    timeout: 20s
+    retries: 3
+
+
 services:
+  
+ ### Camunda Engine ###
+  camunda-engine:
+    image: planqk/camunda-process-view-plugins:v1.0.4
+    ports:
+      - 8090:8080
+    networks:
+      - default
+
+  workflow-modeler:
+    image: planqk/workflow-modeler:v1.5.4
+    environment:
+      CAMUNDA_ENDPOINT: http://localhost:8090/engine-rest
+      ENABLE_DATA_FLOW_PLUGIN: 'false'
+      ENABLE_OPENTOSCA_PLUGIN: 'true'
+      ENABLE_PATTERN_PLUGIN: 'true'
+      ENABLE_PLANQK_PLUGIN: 'false'
+      ENABLE_QHANA_PLUGIN: 'false'
+      ENABLE_QUANTME_PLUGIN: 'true'
+      OPENTOSCA_ENDPOINT: http://localhost:1337/csars
+      PATTERN_ATLAS_ENDPOINT: http://localhost:1977/patternatlas/patternLanguages/af7780d5-1f97-4536-8da7-4194b093ab1d
+      PATTERN_ATLAS_UI_ENDPOINT: http://localhost:1978
+      QC_ATLAS_ENDPOINT: http://localhost:6626
+      QPROV_ENDPOINT: http://localhost:8094/qprov
+      QRM_USERNAME: UST-QuAntiL
+      QRM_REPONAME: QuantME-UseCases
+      QRM_REPOPATH: 2025-icse/qrms-docker
+      SCRIPT_SPLITTER_ENDPOINT: http://localhost:8891
+      WINERY_ENDPOINT: http://localhost:8093/winery
+    ports:
+      - 1893:8080
+    networks:
+      - default
+
+
+  ### Database ###
+  db:
+    build:
+      context: db
+    environment:
+      QC_ATLAS_CONTENT_REPOSITORY_BRANCH: 'feature/low-code-models-insertion'
+    networks:
+      - default
+
+
+  ### QC Atlas ###
+  qc-atlas:
+    image: planqk/atlas:v3.1.4
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOSTNAME: db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: db
+    ports:
+      - "6626:6626"
+    networks:
+      - default
+
   qhana-plugin-runner:
     profiles: ["plugin-runner"]
     image: ghcr.io/ust-quantil/qhana-plugin-runner:main
@@ -20,7 +99,7 @@ services:
       PLUGIN_REGISTRY_URL: "http://localhost:5006/api/"
       DEFAULT_FILE_STORE: "minio"
       MINIO_CLIENT: '{"endpoint": "localhost:9000", "access_key": "QHANA", "secret_key": "QHANAQHANA", "secure": false}'
-      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":5005 :5006 :5007 :5080 :9000 :9001 :9091 ${EXTRA_PROXY_PORTS}"
+      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":5005 :5006 :5007 :9000 :9001 :9091"
       GIT_PLUGINS: &git-plugins "git+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@main#subdirectory=/stable_plugins\ngit+https://github.com/UST-QuAntiL/nisq-analyzer-prio-service.git@master#subdirectory=/plugins"
       PLUGIN_FOLDERS: &plugin-folders ./git-plugins:./git-plugins/classical_ml/data_preparation:./git-plugins/classical_ml/scikit_ml:./git-plugins/data_synthesis:./git-plugins/demo:./git-plugins/file_utils:./git-plugins/infrastructure:./git-plugins/muse:./git-plugins/nisq_analyzer:./git-plugins/quantum_ml/max_cut:./git-plugins/quantum_ml/pennylane_qiskit_ml:./git-plugins/quantum_ml/qiskit_ml:./git-plugins/visualization/complex:./git-plugins/visualization/file_types:./git-plugins/workflow
       CAMUNDA_API_URL: "http://localhost:5080/engine-rest"
@@ -358,6 +437,66 @@ services:
     # restart: unless-stopped
     volumes:
       - leqo-data:/var/lib/postgresql/data
+
+  # For the pattern-atlas plugin
+  pattern-atlas-api:
+    image: patternatlas/pattern-atlas-api:latest
+    environment:
+      JDBC_DATABASE_URL: postgres-pattern-atlas
+      JDBC_DATABASE_PORT: 5432
+      JDBC_DATABASE_NAME: patternatlas
+      JDBC_DATABASE_USERNAME: patternatlas
+      JDBC_DATABASE_PASSWORD: patternatlas
+      DB_INIT_PASSWORD: patternatlas
+      DB_INIT_USER: patternatlas
+      LATEX_RENDERER_HOST_NAME: latex-renderer
+      LATEX_RENDERER_PORT: 5030
+      API_PORT: 1977
+      PATTERN_ATLAS_FETCH_INITIAL_DATA: 'true'
+      # HAL_EXPLORER: 'false'
+      # activate correct application properties
+      # SPRING_PROFILES_ACTIVE: docker
+      # SECURITY_LOGLEVEL: info
+    ports:
+      - '1977:1977'
+    networks:
+      - default
+    depends_on:
+      - postgres-pattern-atlas
+      - latex-renderer
+  pattern-atlas-ui:
+    profiles: ["pattern-atlas-ui"]
+    image: patternatlas/pattern-atlas-ui:latest
+    # depends_on:
+    #   - config-server
+    environment:
+      # because the requests are performed from the browser and not
+      # from the container itself we have to specify localhost here
+      # and **not** the container name
+      PATTERN_ATLAS_API_HOST_NAME: localhost
+      PATTERN_ATLAS_API_PORT: 1977
+      LATEX_RENDERER_HOST_NAME: localhost
+      LATEX_RENDERER_PORT: 5030
+    ports:
+      - "1978:80"
+    networks:
+      - default
+  postgres-pattern-atlas:
+    image: "postgres:latest"
+    ports:
+      - "5061:5432"
+    environment:
+      POSTGRES_USER: patternatlas
+      POSTGRES_PASSWORD: patternatlas
+      POSTGRES_DB: patternatlas
+    networks:
+      - default
+  latex-renderer:
+    image: planqk/latex-renderer:latest
+    ports:
+      - "5030:5030"
+    networks:
+      - default
       
 volumes:
   minio:
