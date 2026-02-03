@@ -427,7 +427,6 @@ services:
       - "8000:80"
   leqo-postgres:
     image: postgres:latest
-    shm_size: 128mb
     environment:
       POSTGRES_USER: leqo
       POSTGRES_PASSWORD: unsave_passwd
@@ -435,8 +434,6 @@ services:
     ports:
       - "5434:5432"
     # restart: unless-stopped
-    volumes:
-      - leqo-data:/var/lib/postgresql/data
 
   # For the pattern-atlas plugin
   pattern-atlas-api:
@@ -503,7 +500,6 @@ volumes:
   instance:
   experiments:
   exec_data:
-  leqo-data:
 networks:
   default:
     driver: bridge
