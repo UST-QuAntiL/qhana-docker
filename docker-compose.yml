@@ -414,7 +414,8 @@ services:
 
   # For the low-code-modeler plugin
   leqo-backend:
-    image: ghcr.io/leqo-framework/leqo-backend:main
+    #image: ghcr.io/leqo-framework/leqo-backend:main
+    build: https://github.com/LEQO-Framework/leqo-backend.git#feature/ml-nodes
     environment:
       POSTGRES_USER: leqo
       POSTGRES_PASSWORD: unsave_passwd
