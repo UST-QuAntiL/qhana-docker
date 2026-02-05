@@ -64,7 +64,8 @@ services:
 
   ### QC Atlas ###
   qc-atlas:
-    image: planqk/atlas:v3.1.4
+    #image: planqk/atlas:v3.1.4
+    build: https://github.com/UST-QuAntiL/qc-atlas.git#feature/implementation-package-type
     depends_on:
       - db
     environment:
@@ -181,7 +182,8 @@ services:
     ports:
       - 9091:9090
   ui:
-    image: ghcr.io/ust-quantil/qhana-ui:main
+    #image: ghcr.io/ust-quantil/qhana-ui:main
+    build: https://github.com/UST-QuAntiL/qhana-ui.git#feature/switchPlugin
     ports:
       - 8080:8080
     environment:
