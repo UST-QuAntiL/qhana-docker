@@ -53,9 +53,9 @@ services:
 
 
   ### Database ###
-  db:
+  qc-atlas-db:
     build:
-      context: db
+      context: qc-atlas-db
     environment:
       QC_ATLAS_CONTENT_REPOSITORY_BRANCH: 'feature/low-code-models-insertion'
     ports:
@@ -69,9 +69,9 @@ services:
     #image: planqk/atlas:v3.1.4
     build: https://github.com/UST-QuAntiL/qc-atlas.git#feature/implementation-package-type
     depends_on:
-      - db
+      - qc-atlas-db
     environment:
-      POSTGRES_HOSTNAME: localhost
+      POSTGRES_HOSTNAME: host.docker.internal
       POSTGRES_PORT: 5435
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -80,6 +80,8 @@ services:
       - "6626:6626"
     networks:
       - default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   qhana-plugin-runner:
     profiles: ["plugin-runner"]
