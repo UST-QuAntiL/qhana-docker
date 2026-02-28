@@ -58,6 +58,8 @@ services:
       context: db
     environment:
       QC_ATLAS_CONTENT_REPOSITORY_BRANCH: 'feature/low-code-models-insertion'
+    ports:
+      - "5435:5432"
     networks:
       - default
 
@@ -69,8 +71,8 @@ services:
     depends_on:
       - db
     environment:
-      POSTGRES_HOSTNAME: db
-      POSTGRES_PORT: 5432
+      POSTGRES_HOSTNAME: localhost
+      POSTGRES_PORT: 5435
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: db
