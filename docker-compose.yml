@@ -20,11 +20,9 @@ services:
       PLUGIN_REGISTRY_URL: "http://localhost:5006/api/"
       DEFAULT_FILE_STORE: "minio"
       MINIO_CLIENT: '{"endpoint": "localhost:9000", "access_key": "QHANA", "secret_key": "QHANAQHANA", "secure": false}'
-      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":1977 :5005 :5006 :5007 :5030 :5080 :6626 :8000 :8081 :8082 :8083 :8084 :8085 :8098 :9000 :9001 :9091 ${EXTRA_PROXY_PORTS}"
-      GIT_PLUGINS: &git-plugins "git+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@main#subdirectory=/stable_plugins\ngit+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@feature/pattern-atlas#subdirectory=/stable_plugins/pattern_atlas\ngit+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@feature/low-code-modeler#subdirectory=/stable_plugins/low_code_modeler"
-      PLUGIN_FOLDERS: &plugin-folders ./git-plugins:./git-plugins/classical_ml/data_preparation:./git-plugins/classical_ml/scikit_ml:./git-plugins/data_synthesis:./git-plugins/demo:./git-plugins/file_utils:./git-plugins/infrastructure:./git-plugins/muse:./git-plugins/quantum_ml/max_cut:./git-plugins/quantum_ml/pennylane_qiskit_ml:./git-plugins/quantum_ml/qiskit_ml:./git-plugins/visualization/complex:./git-plugins/visualization/file_types:./git-plugins/workflow:./git-plugins/pattern_atlas:./git-plugins/low_code_modeler
-      CAMUNDA_API_URL: "http://localhost:5080/engine-rest"
-      CAMUNDA_WORKER_ID: "6756b650-033c-4815-948b-fbae08453a9f"
+      LOCALHOST_PROXY_PORTS: &localhost-proxy-ports ":1977 :5005 :5006 :5007 :5030 :6626 :8000 :8081 :8082 :8083 :8084 :8085 :8098 :9000 :9001 :9091 ${EXTRA_PROXY_PORTS}"
+      GIT_PLUGINS: &git-plugins "git+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@main#subdirectory=/stable_plugins\ngit+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@feature/music-feature-extractor#subdirectory=/stable_plugins/classical_ml/data_preparation/music_feature_extractor\ngit+https://github.com/UST-QuAntiL/qhana-plugin-runner.git@main#subdirectory=/plugins/sql_loader"
+      PLUGIN_FOLDERS: &plugin-folders ./git-plugins:./git-plugins/classical_ml/data_preparation:./git-plugins/classical_ml/scikit_ml:./git-plugins/data_synthesis:./git-plugins/demo:./git-plugins/file_utils:./git-plugins/infrastructure:./git-plugins/muse:./git-plugins/quantum_ml/max_cut:./git-plugins/quantum_ml/pennylane_qiskit_ml:./git-plugins/quantum_ml/qiskit_ml:./git-plugins/visualization/complex:./git-plugins/visualization/file_types:./git-plugins/music_feature_extractor:./git-plugins/sql_loader
       SERVICE_DATA_CONFIG: "http://localhost:6789" # ensure this is an unused port
       LCM_QunicornEndpoint: "http://localhost:8081"
       LCM_PatternAtlasApiEndpoint: "http://localhost:1977/patternatlas/patternLanguages/af7780d5-1f97-4536-8da7-4194b093ab1d"
@@ -93,8 +91,6 @@ services:
       LOCALHOST_PROXY_PORTS: *localhost-proxy-ports
       GIT_PLUGINS: *git-plugins
       PLUGIN_FOLDERS: *plugin-folders
-      CAMUNDA_API_URL: "http://localhost:5080/engine-rest"
-      CAMUNDA_WORKER_ID: "6756b650-033c-4815-948b-fbae08453a9f"
       SERVICE_DATA_CONFIG: "http://localhost:6789" # ensure this is an unused port
       LCM_QunicornEndpoint: "http://localhost:8081"
       LCM_PatternAtlasApiEndpoint: "http://localhost:1977/patternatlas/patternLanguages/af7780d5-1f97-4536-8da7-4194b093ab1d"
@@ -146,7 +142,6 @@ services:
       PRECONFIGURED_SERVICES: '[
           {"serviceId": "qhana-backend", "name": "Backend", "url": "http://localhost:9091"},
           {"serviceId": "latex-renderer", "name": "LaTeX Renderer", "url": "http://localhost:5030"},
-          {"serviceId": "camunda", "name": "Camunda", "url": "http://localhost:5080/engine-rest"},
           {"serviceId": "qunicorn", "name": "Qunicorn", "url": "http://localhost:8081"},
           {"serviceId": "low-code-backend", "name": "Low-Code Backend", "url": "http://localhost:8000"},
           {"serviceId": "pattern-atlas", "name": "Pattern Atlas", "url": "http://localhost:1977"}
@@ -172,135 +167,11 @@ services:
       PLUGIN_DISCOVERY_INTERVAL: 60
       PERIODIC_SCHEDULER: true
 
-  # For Workflows
-  camunda:
-    profiles: ["workflow", "all"]
-    image: camunda/camunda-bpm-platform:run-latest
-    ports:
-      - '5080:8080'
-    networks:
-      - default
-
-
-
-  # Qunicorn
-  qunicorn-server:
-    profiles: ["qunicorn", "all"]
-    image: ghcr.io/qunicorn/qunicorn-core:main
-    environment:
-      CONTAINER_MODE: server
-      SERVER_PORT: 8080
-      BROKER_URL: "redis://redis:6379"
-      DB_URL: "postgresql+psycopg://user:passwd@qunicorn-db/qunicorn"
-      # JWKS_URL: "http://keycloak:8080/auth/realms/qunicorn/protocol/openid-connect/certs"
-      NUMBA_CACHE_DIR: "/app/cache"
-    depends_on:
-      - qunicorn-db
-      - redis
-    ports:
-      - "8081:8080"
-  qunicorn-worker:
-    profiles: ["qunicorn", "all"]
-    image: ghcr.io/qunicorn/qunicorn-core:main
-    environment:
-      CONTAINER_MODE: worker
-      BROKER_URL: "redis://redis:6379"
-      DB_URL: "postgresql+psycopg://user:passwd@qunicorn-db/qunicorn"
-      NUMBA_CACHE_DIR: "/app/cache"
-    depends_on:
-      - qunicorn-db
-      - redis
-    ports:
-      - "6379"
-  qunicorn-db:
-    profiles: ["qunicorn", "all"]
-    image: postgres:latest
-    environment:
-      POSTGRES_PASSWORD: passwd
-      POSTGRES_USER: user
-      POSTGRES_DB: qunicorn
-    ports:
-      - "5434:5432"
-
-
-
-  ## Low-Code 
-  leqo-backend:
-    profiles: ["lowcode", "all"]
-    image: ghcr.io/leqo-framework/leqo-backend:0.2
-    environment:
-      POSTGRES_USER: leqo
-      POSTGRES_PASSWORD: unsave_passwd
-      POSTGRES_DB: qasm
-      POSTGRES_PORT: 5432
-      POSTGRES_HOST: postgres-backend
-      SQLALCHEMY_DRIVER: postgresql+psycopg
-      QISKIT_COMPAT_MODE: TRUE
-    depends_on:
-      - postgres-backend
-    ports:
-      - "8000:80"
-  postgres-backend:
-    profiles: ["lowcode", "all"]
-    image: postgres:latest
-    shm_size: 128mb
-    environment:
-      POSTGRES_USER: leqo
-      POSTGRES_PASSWORD: unsave_passwd
-      POSTGRES_DB: qasm
-    ports:
-      - "5435:5432"
-
-
-
-  pattern-atlas-api:
-    profiles: ["patterns", "all"]
-    image: patternatlas/pattern-atlas-api:v1.9.0
-    environment:
-      JDBC_DATABASE_URL: postgres-patterns
-      JDBC_DATABASE_USERNAME: patternatlas
-      JDBC_DATABASE_PASSWORD: patternatlas
-      JDBC_DATABASE_PORT: 5432
-      DB_INIT_USER: patternatlas
-      DB_INIT_PASSWORD: patternatlas
-      LATEX_RENDERER_HOST_NAME: latex-renderer
-      LATEX_RENDERER_PORT: 5432
-      JDBC_DATABASE_NAME: patternatlas
-      PATTERN_ATLAS_FETCH_INITIAL_DATA: 'true'
-      HAL_EXPLORER: 'false'
-      PATTERNATLAS_CONTENT_REPOSITORY_BRANCH: 'feature/tages-fixes'
-      # activate correct application properties
-      SPRING_PROFILES_ACTIVE: docker
-      SECURITY_LOGLEVEL: info
-    ports:
-      - "1977:1977"
-    depends_on:
-      - postgres-patterns
-      - latex-renderer
-
-  latex-renderer:
-    profiles: ["patterns", "all"]
-    image: planqk/latex-renderer:v1.1.1
-    platform: linux/amd64
-    ports:
-      - "5030:5030"
-  postgres-patterns:
-    profiles: ["patterns", "all"]
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: patternatlas
-      POSTGRES_PASSWORD: patternatlas
-      POSTGRES_DB: patternatlas
-    ports:
-      - "5436:5432"
-
-
 
 volumes:
   minio:
   instance:
   experiments:
-  exec_data:
 networks:
   default:
     driver: bridge
