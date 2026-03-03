@@ -188,8 +188,8 @@ services:
     ports:
       - 9091:9090
   ui:
-    image: ghcr.io/ust-quantil/qhana-ui:main
-    #build: https://github.com/UST-QuAntiL/qhana-ui.git#feature/switchPlugin
+    #image: ghcr.io/ust-quantil/qhana-ui:main
+    build: https://github.com/UST-QuAntiL/qhana-ui.git#feature/switchPlugin
     ports:
       - 8080:8080
     environment:
