@@ -57,7 +57,7 @@ services:
     build:
       context: qc-atlas-db
     environment:
-      QC_ATLAS_CONTENT_REPOSITORY_BRANCH: 'feature/low-code-models-insertion'
+      QC_ATLAS_CONTENT_REPOSITORY_BRANCH: 'feature/quantum-clustering-low-code-model'
     ports:
       - "5435:5432"
     networks:
