@@ -77,30 +77,48 @@ carries mapping values or not. Here, you can simply keep the
 recommended option. Numeric attributes are listed separately with an "Include"
 checkbox instead of a dropdown.
 
-For the demo dataset, use the following settings:
-
-> TODO Add image for the settings
-
+For the demo dataset, use the following selections.
 This guide does not go into the per-attribute Wu-Palmer, Mapping or MDS settings
 panels - for the demo dataset, the shared defaults from the previous page work
-well, so there is no need to open and change them individually.
+well.
+
+![The Taxanomy Attribute Selection](images/feat-eng-pipeline-router-page-21.png)
+
+For the numeric values, the per-attribute setting for the normalization has to be activated (image only the first attribute):
+
+![The Numeric Value Attribute Selection](images/feat-eng-pipeline-router-page-22.png)
+![The Numeric Value Attribute Selection with opened Settings](images/feat-eng-pipeline-router-page-23.png)
+
+Finally, you can activate Principal Component Analysis (PCA) to reduce the dimensions to only three visualizable values.
+
+![PCA Settings activation](images/feat-eng-pipeline-router-page-24.png)
 
 Once all attributes are assigned, click "submit" to start the pipeline execution.
 Depending on the number of sub-plugins involved, this may take a moment; you can
-follow the progress in the "Timeline" tab.
-> TODO That is wrong with the timeline tab. I want to explain how the logging explains what is happening.
+follow the progress in the result log.
+There, you can see the different pipelines that get executed and each executed sub-plugin is listed.
+
+Once it is finished, the result log, states 'All Pipelines Completed Successfully And Dimensions Reduced With PCA!'.
+
+![Result log](images/feat-eng-pipeline-router-page-result.png)
 
 ## Visualizing the results without clustering
 
 As in the MUSE workflow, we can inspect the pipeline output before doing any
 clustering. Switch to the "Outputs" tab of the timeline step and find the final,
-concatenated and PCA-reduced entity vector file. In the "Preview With:" field,
-select "Clustered Scatter Plot Visualization". Since no cluster labels are chosen,
+concatenated and PCA-reduced entity vector file and a visualization preview.
+Since no clustering is done,
 this shows a plain 3D scatter plot of the animals - already a good opportunity to
 check whether the reduced vector still separates the expected animal groups.
-> TODO update above section after verifying it in the UI (no cluster labels?)
->
-> TODO Add one or two images
+
+![PCA reduced Vector Plot](images/feat-eng-pipeline-output-plot.png)
+
+You can also find the final concatenated vector without the PCA reduction.
+Here, you can also find a mapping file, that shows which dimension of the feature vector belongs to which attribute.
+To visualize the original vector, select "Clustered Scatter Plot Visualization" right next to the ``final_concatenated_vector.csv``.  
+This visualization shows which dimensions could be displayed at the three available axes.
+
+![PCA reduced Vector Plot](images/feat-eng-pipeline-output-plot-2.png)
 
 ## Clustering the results
 
@@ -111,27 +129,25 @@ groups in the dataset (e.g. **4**, for farm/grazing animals, land predators,
 birds and marine animals - adjust if the resulting clusters do not look
 meaningful). Tick the "Visualize" box to also generate an HTML plot.
 
-> TODO add Image to that settings
+![The Classical k Means Settings](images/feat-eng-pipeline-cluster-settings.png)
 
 After submitting, switch to the "Outputs" tab. As in the MUSE workflow, you will
 find a JSON file with the cluster labels and, because "Visualize" was ticked, an
-HTML file with the plot. Use "Clustered Scatter Plot Visualization" to preview the
-labeled entity points, or open the HTML file to export the plot as an image.
+HTML file with the plot.
+The resulting cluster can differ.
 
-> TODO Add Image and explain, that the cluster can differ (I think it can differ)
+![The Classical k Means Result Cluster Plot](images/feat-eng-pipeline-cluster-results.png)
+
+In the example cluster, you can see, that the cluster mainly chooses the x-axis for creating groups.
+This is not a distinction into the suspected groups farm/grazing animals, land predators,
+birds and marine animals.
 
 ### Processing the data a second time
 
 As in the MUSE workflow, we can process the same entity vectors again with a
-different clustering plugin to compare results. Select the "Classical k-Medoids"
+different settings or a different clustering plugin to compare results.
+
+For example, you can select the "Classical k-Medoids"
 plugin, choose the same final entity vector file as input, and set "Number of
 Clusters" to a different value (e.g. **3**, for a coarser grouping). Tick
 "Visualize" again and submit.
-
-> TODO Add settings image
->
-> TODO delete this last paragraph? Not sure now.
-
-Compare the two clustering results in the "Outputs" tab: depending on the number
-of clusters chosen, the animal groups may split or merge differently, e.g. birds
-and marine animals might be combined into a single cluster with fewer clusters.
