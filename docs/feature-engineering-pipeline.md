@@ -1,4 +1,4 @@
-# Using the Feature Engineering Pipeline with the demo dataset
+# Using the Feature Engineering Pipeline
 
 The "Feature Engineering Pipeline" plugin turns a set of entities with taxonomy and
 numeric attributes into a single feature vector per entity, which can then be used
@@ -23,21 +23,11 @@ using six attributes:
 - `weightKg` is a single numeric value per animal, `temperatureRangeC` is a
   numeric vector (value range: minimum and maximum tolerated temperature).
 
-> TODO Not sure if the following paragraph is useful? I am especially not sure if we can acchive these clusters. Not everything is implemented yet.
-
-At the end of this guide, we use the pipeline output to compute and visualize
-clusters of animals. Because the dataset combines taxonomic class, diet, habitat
-and climate, the resulting clusters are expected to roughly correspond to
-recognizable animal groups, e.g. farm/grazing animals, land predators, birds, and
-marine animals.
-
 ## Creating the experiment
 
 As in the [MUSE workflow](muse.md), first navigate to the "Experiments" tab and
 create a new experiment by clicking "New Experiment". Fill out the dialog and
 submit it to open the new experiment.
-
-> TODO Add image
 
 ## Loading the dataset
 
@@ -45,17 +35,17 @@ To load the demo dataset, use the "Demo data loader" plugin. Navigate to the
 "Workspace" tab and select the "Demo data loader" plugin. It only has a single
 "Dataset" input field; select "Animals (16 entities, 6 attributes)" and click "submit".
 
-> TODO Add image
+![The Demo Data Loader Plugin](images/feat-eng-pipeline-data-loader.png)
 
 After submitting, verify the successful execution in the "Timeline" tab. The
 plugin produces three files: the entity list, the attribute metadata, and a ZIP
 file containing the taxonomies.
 
-> TODO Add image
+![The Demo Data Loader Plugin Result](images/feat-eng-pipeline-data-loader-result.png)
 
 ## The Feature Engineering Pipeline: Basic settings
 
-Navigate to the "Workspace" tab and select the "Feature Engineering Pipeline"
+Navigate to the "Workspace" tab and search and select the "Feature Engineering Pipeline"
 plugin. Its first page is split into several sections:
 
 - **Basic Data**: the "Entities URL", "Entities Attribute Metadata URL" and
@@ -71,18 +61,10 @@ next page, each attribute can override the Wu-Palmer, Mapping or MDS settings
 individually. For this tutorial, we leave all of these shared defaults as they
 are and only change the settings described below.
 
-For this tutorial, change the following settings:
+For this tutorial you have to change no other settings.
+Feel free to test some other settings here.
 
-- **Concat output**: check this box. Without it, the pipeline would only produce
-  separate vectors per attribute instead of one combined feature vector.
-- **Output Format** (in "Vector Concatenation Settings"): set this to **JSON**.
-  This is important because currently the clustering plugins used later in this guide only
-  reliably accept JSON input, not CSV.
-  > TODO remove after fix is implemented.
-- **Reduce dimensions with PCA**: check this box.
-- **Dimensions** (in "PCA Settings"): set this to **3** to get a complete visualization at the end.
-
-> TODO Add Image
+![The Basic Data input on the first Feature Engineering Pipeline Plugin Page](images/feat-eng-pipeline-router-page-1.png)
 
 Click on submit to get to the attribute selection page, where you can assign the attributes to the pipelines.
 

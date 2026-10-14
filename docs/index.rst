@@ -7,7 +7,7 @@ Welcome to QHAna User Documentation!
 
     quickstart
     muse
-    feature-engineering-pipeline-demo
+    feature-engineering-pipeline
     workflows
     architecture
     docker-compose

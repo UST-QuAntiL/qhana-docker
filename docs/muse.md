@@ -27,6 +27,7 @@ Fill out the dialog and submit it. This will automatically open the new experime
 To import the Mini MUSE dataset, we use the "Costume Loader" plugin.
 Navigate to the "Workspace" tab and select the "Costume Loader" plugin.
 Enter the following parameters in the plugin UI:
+
 - DB host: `muse-db`
 - DB user name: `test`
 - DB password: `test`
