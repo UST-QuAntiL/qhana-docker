@@ -3,13 +3,13 @@
 The "Feature Engineering Pipeline" plugin turns a set of entities with taxonomy and
 numeric attributes into a single feature vector per entity, which can then be used
 for clustering or other machine learning tasks. It was built with the Muse4Music
-dataset in mind, which describes music pieces using taxonomies (e.g. intrumentation, volume)
+dataset in mind, which describes music pieces using taxonomies (e.g. instrumentation, volume)
 and numeric values (e.g. harmonic density). The pipeline routes each attribute through a
 suitable sub-plugin pipeline (Wu-Palmer similarities, Mapping, One-Hot Encoding, or a numeric
 value pipeline), optionally concatenates the resulting vectors and reduces their
 dimensionality with a Principal Component Analysis (PCA) step.
 
-To understand how the pipeline works, without the Muse4Music dataset neede, this guide uses
+To understand how the pipeline works, without the Muse4Music dataset needed, this guide uses
 a small, self-contained "Animals" demo dataset instead.
 
 ## The demo dataset
@@ -58,7 +58,7 @@ plugin. Its first page is split into several sections:
 
 > The settings on this page are **shared defaults for every attribute**. On the
 next page, each attribute can override the Wu-Palmer, Mapping or MDS settings
-individually. For this tutorial, we leave all of these shared defaults as they
+individually per attribute. For this tutorial, we leave all of these shared defaults as they
 are and only change the settings described below.
 
 For this tutorial you have to change no other settings.
@@ -81,10 +81,12 @@ For the demo dataset, use the following selections.
 This guide does not go into the per-attribute Wu-Palmer, Mapping or MDS settings
 panels - for the demo dataset, the shared defaults from the previous page work
 well.
+But if you like, you can click on the 'Settings' Button on the right of each attrbute and overwrite the default settings
+from the previous page per attribute.
 
-![The Taxanomy Attribute Selection](images/feat-eng-pipeline-router-page-21.png)
+![The Taxonomy Attribute Selection](images/feat-eng-pipeline-router-page-21.png)
 
-For the numeric values, the per-attribute setting for the normalization has to be activated (image only the first attribute):
+For the numeric values, the per-attribute setting for the normalization has to be activated (image only shows the first attribute):
 
 ![The Numeric Value Attribute Selection](images/feat-eng-pipeline-router-page-22.png)
 ![The Numeric Value Attribute Selection with opened Settings](images/feat-eng-pipeline-router-page-23.png)
@@ -111,14 +113,20 @@ Since no clustering is done,
 this shows a plain 3D scatter plot of the animals - already a good opportunity to
 check whether the reduced vector still separates the expected animal groups.
 
-![PCA reduced Vector Plot](images/feat-eng-pipeline-output-plot.png)
+![PCA reduced Vector Plot](images/feat-eng-pipeline-output-pca-vector-plot.png)
 
 You can also find the final concatenated vector without the PCA reduction.
 Here, you can also find a mapping file, that shows which dimension of the feature vector belongs to which attribute.
-To visualize the original vector, select "Clustered Scatter Plot Visualization" right next to the ``final_concatenated_vector.csv``.  
+Therefore, look for the ``final_concatenated_vector.csv`` in the "csv-visualization".
+It shows in each dimension to which attribute this dimension belongs.
+The mapping is taken from the ``final_concatenated_vector_dimension_mapping.json`` right underneath:
+
+![The Feature Vector with Mapping values per Dimension](images/feat-eng-pipeline-output-vector-mapping.png)
+
+To visualize this original vector, select "Clustered Scatter Plot Visualization" right next to the ``final_concatenated_vector.csv``.  
 This visualization shows which dimensions could be displayed at the three available axes.
 
-![PCA reduced Vector Plot](images/feat-eng-pipeline-output-plot-2.png)
+![Feature Vector Plot](images/feat-eng-pipeline-output-feature-vector-plot.png)
 
 ## Clustering the results
 
@@ -144,7 +152,7 @@ birds and marine animals.
 
 ### Processing the data a second time
 
-As in the MUSE workflow, we can process the same entity vectors again with a
+As in the MUSE workflow, we can process the same entity vectors again with
 different settings or a different clustering plugin to compare results.
 
 For example, you can select the "Classical k-Medoids"
